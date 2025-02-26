@@ -1,4 +1,7 @@
 require 'mechanize'
+require 'sqlite3'
+require 'logger'
+require 'date'
 
 logger = Logger.new(STDOUT)
 
