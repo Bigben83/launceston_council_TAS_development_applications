@@ -87,7 +87,19 @@ page.css('table.grid').each do |table|
   logger.info("Application URL: #{application_url}")
   logger.info("-----------------------------------")
 
-  
+  # Ensure the entry does not already exist before inserting
+  existing_entry = db.execute("SELECT * FROM launceston WHERE council_reference = ?", council_reference)
+
+  if existing_entry.empty?
+    db.execute("INSERT INTO launceston 
+      (council_reference, description, address, on_notice_to, date_scraped, application_url) 
+      VALUES (?, ?, ?, ?, ?, ?)",
+      [council_reference, description, address, on_notice_to, date_scraped, application_url])
+
+    logger.info("Data for #{council_reference} saved to database.")
+  else
+    logger.info("Duplicate entry for document #{council_reference} found. Skipping insertion.")
+  end
 end
 
 logger.info("Data has been successfully inserted into the database.")
