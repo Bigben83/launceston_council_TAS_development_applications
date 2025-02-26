@@ -18,6 +18,7 @@ begin
   http.read_timeout = 120
 
   request = Net::HTTP::Get.new(url)
+  request["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
   response = http.request(request)
   
   if response.code.to_i != 200
