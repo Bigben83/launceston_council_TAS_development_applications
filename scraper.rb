@@ -3,7 +3,6 @@ require 'open-uri'
 require 'sqlite3'
 require 'logger'
 require 'date'
-require 'cgi'
 
 # Set up a logger to log the scraped data
 logger = Logger.new(STDOUT)
@@ -11,12 +10,15 @@ logger = Logger.new(STDOUT)
 # Define the URL of the page
 url = "https://onlineservice.launceston.tas.gov.au/eProperty/P1/PublicNotices/AllPublicNotices.aspx?r=P1.LCC.WEBGUEST&f=%24P1.ESB.PUBNOTAL.ENQ"
 
-# Step 1: Fetch the page content for the main listing
+# Step 1: Fetch the page content with improved error handling
 begin
   logger.info("Fetching page content from: #{url}")
-  page_html = open(url).read
+  page_html = URI.open(url).read
   logger.info("Successfully fetched page content.")
-rescue => e
+rescue OpenURI::HTTPError => e
+  logger.error("HTTP Error: #{e.message}")
+  exit
+rescue StandardError => e
   logger.error("Failed to fetch page content: #{e}")
   exit
 end
@@ -62,15 +64,18 @@ date_scraped = Date.today.to_s
 
 logger.info("Start Extraction of Data")
 
-# Loop through each application table
-page.css('table.grid').each do |table|
+logger.info("Start Extraction of Data")
+
+# Loop through each application table (each one is a separate planning application)
+doc.css('table.grid').each do |table|
+  # Extract application details from each table
   council_reference = table.at_css('a')&.text&.strip
   application_url = table.at_css('a')&.[]('href')
   application_url = URI.join(url, application_url).to_s if application_url
 
-  description = table.xpath(".//td[contains(text(), 'Application Description')]/following-sibling::td").text.strip
-  address = table.xpath(".//td[contains(text(), 'Property Address')]/following-sibling::td").text.strip
-  on_notice_to_raw = table.xpath(".//td[contains(text(), 'Closing Date')]/following-sibling::td").text.strip
+  description = table.at_xpath('.//tr[td[contains(text(), "Application Description")]]/td[2]')&.text&.strip
+  address = table.at_xpath('.//tr[td[contains(text(), "Property Address")]]/td[2]')&.text&.strip
+  on_notice_to_raw = table.at_xpath('.//tr[td[contains(text(), "Closing Date")]]/td[2]')&.text&.strip
 
   # Convert Closing Date to YYYY-MM-DD format
   begin
@@ -87,7 +92,7 @@ page.css('table.grid').each do |table|
   logger.info("Application URL: #{application_url}")
   logger.info("-----------------------------------")
 
-  # Ensure the entry does not already exist before inserting
+  # Step 4: Ensure the entry does not already exist before inserting
   existing_entry = db.execute("SELECT * FROM launceston WHERE council_reference = ?", council_reference)
 
   if existing_entry.empty?
@@ -101,5 +106,4 @@ page.css('table.grid').each do |table|
     logger.info("Duplicate entry for document #{council_reference} found. Skipping insertion.")
   end
 end
-
 logger.info("Data has been successfully inserted into the database.")
