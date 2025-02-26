@@ -10,4 +10,4 @@ gem "scraperwiki", git: "https://github.com/openaustralia/scraperwiki-ruby.git",
 gem "mechanize"
 gem "selenium-webdriver", '~> 4.29', '>= 4.29.1'
 
-bundle install
+gem install selenium-webdriver
