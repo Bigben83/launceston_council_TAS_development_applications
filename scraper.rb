@@ -61,7 +61,6 @@ document_description = ''
 date_scraped = Date.today.to_s
 
 logger.info("Start Extraction of Data")
-logger.info("Start Extraction of Data")
 
 # Loop through each application table
 page.css('table.grid').each do |table|
