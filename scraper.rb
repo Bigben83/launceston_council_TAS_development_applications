@@ -3,6 +3,7 @@ require 'open-uri'
 require 'sqlite3'
 require 'logger'
 require 'date'
+require 'cgi'
 
 # Set up a logger to log the scraped data
 logger = Logger.new(STDOUT)
@@ -23,10 +24,10 @@ end
 # Step 2: Parse the page content using Nokogiri
 page = Nokogiri::HTML(page_html)
 
-# Step 3: Initialize the SQLite database
+# Step 2: Initialize the SQLite database
 db = SQLite3::Database.new "data.sqlite"
 
-# Create a table specific to Tasman Council if it doesn't exist
+# Create a table specific to Launceston Council if it doesn't exist
 db.execute <<-SQL
   CREATE TABLE IF NOT EXISTS launceston (
     id INTEGER PRIMARY KEY,
