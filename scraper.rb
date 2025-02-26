@@ -11,7 +11,7 @@ logger = Logger.new(STDOUT)
 # Define the URL of the page
 url = "https://onlineservice.launceston.tas.gov.au/eProperty/P1/PublicNotices/AllPublicNotices.aspx?r=P1.LCC.WEBGUEST&f=%24P1.ESB.PUBNOTAL.ENQ"
 
-# Step 1: Fetch the page content
+# Step 1: Fetch the page content for the main listing
 begin
   logger.info("Fetching page content from: #{url}")
   page_html = open(url).read
@@ -22,9 +22,9 @@ rescue => e
 end
 
 # Step 2: Parse the page content using Nokogiri
-page = Nokogiri::HTML(page_html)
+doc = Nokogiri::HTML(page_html)
 
-# Step 2: Initialize the SQLite database
+# Step 3: Initialize the SQLite database
 db = SQLite3::Database.new "data.sqlite"
 
 # Create a table specific to Launceston Council if it doesn't exist
