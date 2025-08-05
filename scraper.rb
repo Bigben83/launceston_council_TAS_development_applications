@@ -4,6 +4,8 @@ require 'sqlite3'
 require 'logger'
 require 'date'
 require 'uri'
+require 'open-uri'
+require 'net/http'
 
 logger = Logger.new(STDOUT)
 
@@ -12,7 +14,12 @@ main_url = "#{base_url}AllPublicNotices.aspx?r=P1.LCC.WEBGUEST&f=%24P1.ESB.PUBNO
 
 begin
   logger.info("Fetching page content from: #{main_url}")
-  page_html = open(main_url, "User-Agent" => "Mozilla/5.0").read
+  uri = URI(url)
+page_html = URI.open(uri, 
+  "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+  read_timeout: 120,
+  open_timeout: 120
+).read
   logger.info("Successfully fetched page content.")
 rescue => e
   logger.error("Failed to fetch page content: #{e}")
