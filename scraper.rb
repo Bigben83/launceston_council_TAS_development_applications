@@ -14,7 +14,7 @@ main_url = "#{base_url}AllPublicNotices.aspx?r=P1.LCC.WEBGUEST&f=%24P1.ESB.PUBNO
 
 begin
   logger.info("Fetching page content from: #{main_url}")
-  uri = URI(url)
+  uri = URI(main_url)
 page_html = URI.open(uri, 
   "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
   read_timeout: 120,
